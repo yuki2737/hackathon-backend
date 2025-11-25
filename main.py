@@ -71,3 +71,28 @@ def select():
         return {"data": result}
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/insert-user")
+def insert_user(name: str):
+    try:
+        conn = get_conn()
+        with conn.cursor() as cursor:
+            cursor.execute("INSERT INTO users (name) VALUES (%s)", (name,))
+            conn.commit()
+        conn.close()
+        return {"message": f"Inserted user: {name}"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/list-users")
+def list_users():
+    try:
+        conn = get_conn()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, name, created_at FROM users")
+            rows = cursor.fetchall()
+        conn.close()
+        return rows
+    except Exception as e:
+        return {"error": str(e)}
