@@ -35,6 +35,38 @@ func main() {
 	mux.Handle("/user", controller.NewUserSearchHandler(searchUC))              // GET /user?name=...
 	mux.Handle("/user/register", controller.NewUserRegisterHandler(registerUC)) // POST /user/register
 
+	// --- DBテスト用ハンドラー —--
+	mux.HandleFunc("/test-db", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		// INSERT
+		_, err := db.ExecContext(ctx, "INSERT INTO USER(name) VALUES(?)", "test-user")
+		if err != nil {
+			log.Printf("INSERT error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "INSERT failed: %v", err)
+			return
+		}
+
+		// SELECT
+		rows, err := db.QueryContext(ctx, "SELECT id, name FROM USER")
+		if err != nil {
+			log.Printf("SELECT error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "SELECT failed: %v", err)
+			return
+		}
+		defer rows.Close()
+
+		fmt.Fprintf(w, "Users:\n")
+		for rows.Next() {
+			var id int
+			var name string
+			rows.Scan(&id, &name)
+			fmt.Fprintf(w, "id=%d name=%s\n", id, name)
+		}
+	})
+
 	// --- サーバ起動（Graceful Shutdown付き） ---
 	srv := &http.Server{Addr: ":8000", Handler: mux}
 
