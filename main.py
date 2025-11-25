@@ -8,8 +8,9 @@ def get_conn():
     return pymysql.connect(
         user=os.getenv("MYSQL_USER"),
         password=os.getenv("MYSQL_PWD"),
+        host=os.getenv("MYSQL_HOST"),
         database=os.getenv("MYSQL_DATABASE"),
-        unix_socket=f"/cloudsql/{os.getenv('MYSQL_INSTANCE')}",
+        unix_socket=os.getenv("MYSQL_HOST"),   # ★ Cloud Run 用
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor
     )
