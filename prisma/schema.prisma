@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  uid       String?   @unique // Firebase UID（null 許可にして既存データも守る）
+  name      String
+  email     String    @unique
+  password  String
+  products  Product[]
+  orders    Order[]   @relation("UserOrders")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  category    Category
+  title       String
+  description String?
+  price       Int
+  imageUrl    String
+  status      Status   @default(selling)
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  buyerId     Int
+  buyer       User     @relation("UserOrders", fields: [buyerId], references: [id])
+  purchasedAt DateTime @default(now())
+}
+
+enum Category {
+  fashion
+  electronics
+  book
+  hobby
+  sports
+  beauty
+  lifestyle
+  handmade
+  kids
+  pet
+  food
+  other
+}
+
+enum Status {
+  selling
+  sold_out
+}

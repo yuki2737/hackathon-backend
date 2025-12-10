@@ -1,0 +1,1 @@
+{"version":3,"file":"User.d.ts","sourceRoot":"","sources":["../../../../src/features/auth/domain/User.ts"],"names":[],"mappings":"AAAA,qBAAa,IAAI;IAEN,GAAG,EAAE,MAAM;IACX,IAAI,EAAE,MAAM;IACZ,KAAK,EAAE,MAAM;gBAFb,GAAG,EAAE,MAAM,EAAE,eAAe;IAC5B,IAAI,EAAE,MAAM,EACZ,KAAK,EAAE,MAAM;CAEvB"}
