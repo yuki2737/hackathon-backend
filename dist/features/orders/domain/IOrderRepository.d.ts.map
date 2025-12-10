@@ -1,0 +1,1 @@
+{"version":3,"file":"IOrderRepository.d.ts","sourceRoot":"","sources":["../../../../src/features/orders/domain/IOrderRepository.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,SAAS,CAAC;AAEhC,MAAM,WAAW,gBAAgB;IAC/B,WAAW,CAAC,SAAS,EAAE,MAAM,EAAE,OAAO,EAAE,MAAM,GAAG,OAAO,CAAC,KAAK,CAAC,CAAC;CACjE"}
