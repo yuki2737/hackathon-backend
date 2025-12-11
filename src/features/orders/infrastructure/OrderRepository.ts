@@ -37,12 +37,15 @@ export class OrderRepository implements IOrderRepository {
       order.id,
       order.productId,
       order.buyerId,
-      order.purchasedAt
+      order.purchasedAt,
+      product
     );
   }
 
-  async findAll(): Promise<Order[]> {
+  async findAll(buyerId?: number): Promise<Order[]> {
+    const whereCondition = buyerId ? { buyerId } : {};
     const orders = await prisma.order.findMany({
+      where: whereCondition,
       orderBy: { purchasedAt: "desc" },
       include: {
         product: true,
@@ -52,7 +55,13 @@ export class OrderRepository implements IOrderRepository {
 
     return orders.map(
       (order) =>
-        new Order(order.id, order.productId, order.buyerId, order.purchasedAt)
+        new Order(
+          order.id,
+          order.productId,
+          order.buyerId,
+          order.purchasedAt,
+          order.product
+        )
     );
   }
 }
