@@ -4,7 +4,7 @@ import { OrderRepository } from "../infrastructure/OrderRepository";
 export class ListOrdersUseCase {
   constructor(private readonly orderRepository: OrderRepository) {}
 
-  async execute() {
-    return this.orderRepository.findAll();
+  async execute(buyerId?: number) {
+    return this.orderRepository.findAll(buyerId);
   }
 }

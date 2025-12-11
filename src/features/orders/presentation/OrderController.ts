@@ -8,7 +8,7 @@ export class OrderController {
     try {
       const { productId, buyerId } = req.body;
       const useCase = new CreateOrderUseCase(new OrderRepository());
-      const order = await useCase.execute(productId, buyerId);
+      const order = await useCase.execute(Number(productId), Number(buyerId));
 
       return res.status(201).json({ message: "Order created", order });
     } catch (error: any) {
@@ -18,6 +18,8 @@ export class OrderController {
 
   async list(req: Request, res: Response) {
     try {
+      const buyerId = req.query.userId ? Number(req.query.userId) : undefined; // ← 追加
+
       const useCase = new ListOrdersUseCase(new OrderRepository());
       const orders = await useCase.execute();
 
