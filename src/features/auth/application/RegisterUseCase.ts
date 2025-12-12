@@ -21,7 +21,7 @@ export class RegisterUseCase {
     const hashedPassword = await hashPassword(password);
 
     // Userドメイン作成（3引数）
-    const user = new User(uid, name, email);
+    const user = new User(0, uid, name, email);
 
     // DB保存
     const newUser = await this.userRepository.create(user, hashedPassword);

@@ -3,13 +3,24 @@ import { ProductRepository } from "../infrastructure/ProductRepository";
 import { ListProductsUseCase } from "../application/ListProductsUseCase";
 import { GetProductDetailUseCase } from "../application/GetProductDetailUseCase";
 import { CreateProductUseCase } from "../application/CreateProductUseCase";
-import { Prisma } from "@prisma/client";
 
 export class ProductController {
   async list(req: Request, res: Response) {
     try {
       const useCase = new ListProductsUseCase(new ProductRepository());
-      const products = await useCase.execute();
+      const { uid, keyword } = req.query;
+
+      const uidParam = typeof uid === "string" ? uid : undefined;
+      const keywordParam = typeof keyword === "string" ? keyword : undefined;
+
+      // 検索モード：keyword がある場合 → uid は無視
+      let products;
+      if (keywordParam) {
+        products = await useCase.execute(keywordParam, undefined);
+      } else {
+        // 出品一覧モード：uid がある場合のみフィルタ
+        products = await useCase.execute(undefined, uidParam);
+      }
 
       return res.json({ message: "Products fetched successfully", products });
     } catch (error: any) {
@@ -37,18 +48,22 @@ export class ProductController {
 
   async create(req: Request, res: Response) {
     try {
-      const { userId, category, title, description, price, imageUrl, status } =
+      const { uid, category, title, description, price, imageUrl, status } =
         req.body;
+
+      if (!uid) {
+        return res.status(400).json({ error: "uid is required" });
+      }
 
       const useCase = new CreateProductUseCase(new ProductRepository());
       const product = await useCase.execute({
-        userId,
+        uid,
         category,
         title,
         description,
         price,
         imageUrl,
-        status: status as any, // ← Prisma Enum へ変換
+        status: status as any,
       });
 
       return res
