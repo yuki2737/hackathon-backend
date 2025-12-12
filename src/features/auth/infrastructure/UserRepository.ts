@@ -12,7 +12,7 @@ export class UserRepository implements IAuthRepository {
 
     if (!user) return null;
 
-    return new User(user.uid!, user.name, user.email);
+    return new User(user.id, user.uid!, user.name, user.email);
   }
 
   async create(user: User, hashedPassword: string): Promise<User> {
@@ -25,6 +25,16 @@ export class UserRepository implements IAuthRepository {
       },
     });
 
-    return new User(created.uid!, created.name, created.email);
+    return new User(created.id, created.uid!, created.name, created.email);
+  }
+
+  async findByUid(uid: string): Promise<User | null> {
+    const user = await prisma.user.findUnique({
+      where: { uid },
+    });
+
+    if (!user) return null;
+
+    return new User(user.id, user.uid!, user.name, user.email);
   }
 }

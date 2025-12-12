@@ -1,30 +1,29 @@
-import { PrismaClient, $Enums } from "@prisma/client";
+import { PrismaClient, $Enums, User } from "@prisma/client";
 import { IProductRepository } from "../domain/IProductRepository";
 import { Product } from "../domain/Product";
 
 const prisma = new PrismaClient();
 
 export class ProductRepository implements IProductRepository {
-  async findAll(keyword?: string, userId?: string): Promise<Product[]> {
+  async findAll(keyword?: string, uid?: string): Promise<Product[]> {
+    const where: any = {};
+
+    // キーワード検索（独立）
+    if (keyword) {
+      where.OR = [
+        { title: { contains: keyword } },
+        { description: { contains: keyword } },
+      ];
+    }
+
+    // 出品一覧（キーワードが無い時だけ uid で絞り込み）
+    if (!keyword && uid) {
+      where.user = { uid };
+    }
+
     const products = await prisma.product.findMany({
-      where: {
-        AND: [
-          keyword
-            ? {
-                OR: [
-                  { title: { contains: keyword, mode: "insensitive" } as any },
-                  {
-                    description: {
-                      contains: keyword,
-                      mode: "insensitive",
-                    } as any,
-                  },
-                ],
-              }
-            : {},
-          userId ? { userId: Number(userId) } : {},
-        ],
-      },
+      where,
+      include: { user: true },
       orderBy: { createdAt: "desc" },
     });
 
@@ -46,7 +45,10 @@ export class ProductRepository implements IProductRepository {
   }
 
   async findById(id: number): Promise<Product | null> {
-    const p = await prisma.product.findUnique({ where: { id } });
+    const p = await prisma.product.findUnique({
+      where: { id },
+      include: { user: true },
+    });
     if (!p) return null;
 
     return new Product(
@@ -61,6 +63,12 @@ export class ProductRepository implements IProductRepository {
       p.createdAt,
       p.updatedAt
     );
+  }
+
+  async findUserByUid(uid: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { uid },
+    });
   }
 
   async create(product: Product): Promise<Product> {
@@ -123,6 +131,7 @@ export class ProductRepository implements IProductRepository {
       updated.updatedAt
     );
   }
+
   async delete(id: number): Promise<void> {
     await prisma.product.delete({
       where: { id },

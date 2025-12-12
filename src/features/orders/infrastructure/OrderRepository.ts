@@ -15,6 +15,11 @@ export class OrderRepository implements IOrderRepository {
       throw new Error("Product not found");
     }
 
+    // 出品者と購入者が同じ場合は購入不可
+    if (product.userId === buyerId) {
+      throw new Error("You cannot purchase your own product");
+    }
+
     if (product.status === "sold_out") {
       throw new Error("This product is already sold out");
     }
@@ -22,8 +27,12 @@ export class OrderRepository implements IOrderRepository {
     // 注文作成
     const order = await prisma.order.create({
       data: {
-        productId,
-        buyerId,
+        product: {
+          connect: { id: productId },
+        },
+        buyer: {
+          connect: { id: buyerId },
+        },
       },
     });
 
@@ -43,7 +52,10 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findAll(buyerId?: number): Promise<Order[]> {
-    const whereCondition = buyerId ? { buyerId } : {};
+    let whereCondition = {};
+    if (buyerId) {
+      whereCondition = { buyerId };
+    }
     const orders = await prisma.order.findMany({
       where: whereCondition,
       orderBy: { purchasedAt: "desc" },
