@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -9,10 +10,9 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
-  uid       String?   @unique // Firebase UID（null 許可にして既存データも守る）
+  uid       String    @unique
   name      String
   email     String    @unique
-  password  String
   products  Product[]
   orders    Order[]   @relation("UserOrders")
   createdAt DateTime  @default(now())

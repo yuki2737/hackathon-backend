@@ -1,7 +1,7 @@
 import { User } from "./User";
 
 export interface IAuthRepository {
-  findByUid(buyerUid: string): unknown;
+  findByUid(uid: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
-  create(user: User, hashedPassword: string): Promise<User>;
+  create(user: User): Promise<User>;
 }

@@ -7,8 +7,13 @@ class CreateProductUseCase {
         this.productRepository = productRepository;
     }
     async execute(data) {
-        const product = new Product_1.Product(0, data.userId, data.category, data.title, data.description, data.price, data.imageUrl, data.status ?? "selling", // ← Prisma enumに対応する文字列
-        new Date(), new Date());
+        // uid から userId を取得
+        const user = await this.productRepository.findUserByUid(data.uid);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const product = new Product_1.Product(0, user.id, // uid → userId に変換
+        data.category, data.title, data.description, data.price, data.imageUrl, data.status ?? "selling", new Date(), new Date());
         return await this.productRepository.create(product);
     }
 }

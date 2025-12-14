@@ -5,35 +5,39 @@ const client_1 = require("@prisma/client");
 const Product_1 = require("../domain/Product");
 const prisma = new client_1.PrismaClient();
 class ProductRepository {
-    async findAll(keyword, userId) {
+    async findAll(keyword, uid) {
+        const where = {};
+        // キーワード検索（独立）
+        if (keyword) {
+            where.OR = [
+                { title: { contains: keyword } },
+                { description: { contains: keyword } },
+            ];
+        }
+        // 出品一覧（キーワードが無い時だけ uid で絞り込み）
+        if (!keyword && uid) {
+            where.user = { uid };
+        }
         const products = await prisma.product.findMany({
-            where: {
-                AND: [
-                    keyword
-                        ? {
-                            OR: [
-                                { title: { contains: keyword, mode: "insensitive" } },
-                                {
-                                    description: {
-                                        contains: keyword,
-                                        mode: "insensitive",
-                                    },
-                                },
-                            ],
-                        }
-                        : {},
-                    userId ? { userId: Number(userId) } : {},
-                ],
-            },
+            where,
+            include: { user: true },
             orderBy: { createdAt: "desc" },
         });
         return products.map((p) => new Product_1.Product(p.id, p.userId, p.category, p.title, p.description, p.price, p.imageUrl, p.status, p.createdAt, p.updatedAt));
     }
     async findById(id) {
-        const p = await prisma.product.findUnique({ where: { id } });
+        const p = await prisma.product.findUnique({
+            where: { id },
+            include: { user: true },
+        });
         if (!p)
             return null;
         return new Product_1.Product(p.id, p.userId, p.category, p.title, p.description, p.price, p.imageUrl, p.status, p.createdAt, p.updatedAt);
+    }
+    async findUserByUid(uid) {
+        return await prisma.user.findUnique({
+            where: { uid },
+        });
     }
     async create(product) {
         const created = await prisma.product.create({

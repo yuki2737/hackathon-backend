@@ -11,18 +11,25 @@ class UserRepository {
         });
         if (!user)
             return null;
-        return new User_1.User(user.uid, user.name, user.email);
+        return new User_1.User(user.id, user.uid, user.name, user.email);
     }
-    async create(user, hashedPassword) {
+    async create(user) {
         const created = await prisma.user.create({
             data: {
                 uid: user.uid,
                 name: user.name,
                 email: user.email,
-                password: hashedPassword,
             },
         });
-        return new User_1.User(created.uid, created.name, created.email);
+        return new User_1.User(created.id, created.uid, created.name, created.email);
+    }
+    async findByUid(uid) {
+        const user = await prisma.user.findUnique({
+            where: { uid },
+        });
+        if (!user)
+            return null;
+        return new User_1.User(user.id, user.uid, user.name, user.email);
     }
 }
 exports.UserRepository = UserRepository;

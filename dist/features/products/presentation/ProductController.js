@@ -9,7 +9,18 @@ class ProductController {
     async list(req, res) {
         try {
             const useCase = new ListProductsUseCase_1.ListProductsUseCase(new ProductRepository_1.ProductRepository());
-            const products = await useCase.execute();
+            const { uid, keyword } = req.query;
+            const uidParam = typeof uid === "string" ? uid : undefined;
+            const keywordParam = typeof keyword === "string" ? keyword : undefined;
+            // 検索モード：keyword がある場合 → uid は無視
+            let products;
+            if (keywordParam) {
+                products = await useCase.execute(keywordParam, undefined);
+            }
+            else {
+                // 出品一覧モード：uid がある場合のみフィルタ
+                products = await useCase.execute(undefined, uidParam);
+            }
             return res.json({ message: "Products fetched successfully", products });
         }
         catch (error) {
@@ -34,16 +45,19 @@ class ProductController {
     }
     async create(req, res) {
         try {
-            const { userId, category, title, description, price, imageUrl, status } = req.body;
+            const { uid, category, title, description, price, imageUrl, status } = req.body;
+            if (!uid) {
+                return res.status(400).json({ error: "uid is required" });
+            }
             const useCase = new CreateProductUseCase_1.CreateProductUseCase(new ProductRepository_1.ProductRepository());
             const product = await useCase.execute({
-                userId,
+                uid,
                 category,
                 title,
                 description,
                 price,
                 imageUrl,
-                status: status, // ← Prisma Enum へ変換
+                status: status,
             });
             return res
                 .status(201)

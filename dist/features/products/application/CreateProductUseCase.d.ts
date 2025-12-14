@@ -1,7 +1,7 @@
 import { IProductRepository } from "../domain/IProductRepository";
 import { Product } from "../domain/Product";
 export interface CreateProductDTO {
-    userId: number;
+    uid: string;
     category: string;
     title: string;
     description: string;

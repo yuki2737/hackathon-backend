@@ -9,21 +9,30 @@ const AuthRoutes_1 = __importDefault(require("./features/auth/presentation/AuthR
 const ProductRoutes_1 = __importDefault(require("./features/products/presentation/ProductRoutes"));
 const OrderRoutes_1 = __importDefault(require("./features/orders/presentation/OrderRoutes"));
 const app = (0, express_1.default)();
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
+    : [];
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {
-        const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
+        // preflight / curl / server-to-server は必ず許可
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
         }
-        else {
-            callback(new Error("Not allowed by CORS"));
-        }
+        // ❌ false ではなく、明示的にエラーを返さない（preflight 500 防止）
+        return callback(null, true);
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
-// Preflight (OPTIONS) 許可
-app.use((0, cors_1.default)());
+// preflight を必ず通す
+app.options("*", (0, cors_1.default)());
 app.use(express_1.default.json());
+app.get("/health", (_req, res) => {
+    res.status(200).json({ status: "ok" });
+});
 app.use("/auth", AuthRoutes_1.default);
 app.use("/products", ProductRoutes_1.default);
 app.use("/orders", OrderRoutes_1.default);

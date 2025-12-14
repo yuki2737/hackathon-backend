@@ -15,13 +15,12 @@ export class UserRepository implements IAuthRepository {
     return new User(user.id, user.uid!, user.name, user.email);
   }
 
-  async create(user: User, hashedPassword: string): Promise<User> {
+  async create(user: User): Promise<User> {
     const created = await prisma.user.create({
       data: {
         uid: user.uid,
         name: user.name,
         email: user.email,
-        password: hashedPassword,
       },
     });
 

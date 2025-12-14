@@ -1,13 +1,26 @@
-FROM python:3.11-slim
+FROM node:18-slim
 
 WORKDIR /app
 
-COPY . /app
+# Prisma が必要とする OpenSSL をインストール
+RUN apt-get update -y && apt-get install -y openssl
 
-RUN pip install --no-cache-dir -r requirements.txt
+# 依存関係（lock file 前提）
+COPY package*.json ./
+RUN npm ci
 
-# Cloud Run が環境変数 PORT=8080 を注入する
+# ソースコードをコピー
+COPY . .
+
+# Prisma Client を Linux 用に生成
+RUN npx prisma generate
+
+# TypeScript をビルド（dist/ を生成）
+RUN npm run build
+
+# Cloud Run が自動で注入する PORT を利用
 ENV PORT=8080
+EXPOSE 8080
 
-# main.py の uvicorn 起動時に PORT を使う
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
+# dist/server.js を直接起動
+CMD ["node", "dist/server.js"]

@@ -1,24 +1,19 @@
 import { IAuthRepository } from "../domain/IAuthRepository";
 import { User } from "../domain/User";
-import { comparePassword } from "../../../core/utils/crypto";
 
+/**
+ * LoginUseCase
+ * 認証は Firebase Auth 側で完了している前提。
+ * ここでは「Firebase UID をもとにアプリ内 User を取得する」責務のみを持つ。
+ */
 export class LoginUseCase {
   constructor(private readonly userRepository: IAuthRepository) {}
 
-  async execute(email: string, password: string): Promise<User> {
-    // メールでユーザー検索
-    const user = await this.userRepository.findByEmail(email);
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // パスワード照合
-    const isValid = await comparePassword(password, user.password!);
-    if (!isValid) {
-      throw new Error("Invalid password");
-    }
-
-    // ログイン成功 → User(id, uid, name, email) を返す
-    return new User(user.id, user.uid, user.name, user.email);
+  /**
+   * @param uid Firebase Auth の UID
+   */
+  async execute(uid: string): Promise<User | null> {
+    const user = await this.userRepository.findByUid(uid);
+    return user;
   }
 }

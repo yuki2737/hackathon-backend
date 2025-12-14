@@ -1,30 +1,25 @@
 import { IAuthRepository } from "../domain/IAuthRepository";
 import { User } from "../domain/User";
-import { hashPassword } from "../../../core/utils/crypto";
 
 export class RegisterUseCase {
   constructor(private readonly userRepository: IAuthRepository) {}
 
-  async execute(
-    uid: string,
-    name: string,
-    email: string,
-    password: string
-  ): Promise<User> {
-    // 既存メールがあるか確認
-    const existingUser = await this.userRepository.findByEmail(email);
-    if (existingUser) {
-      throw new Error("Email already exists");
+  async execute(uid: string, name: string, email: string): Promise<User> {
+    // ① uid で既存ユーザーを確認（最優先）
+    const existingByUid = await this.userRepository.findByUid(uid);
+    if (existingByUid) {
+      return existingByUid;
     }
 
-    // パスワードをハッシュ化
-    const hashedPassword = await hashPassword(password);
+    // ② email で既存ユーザーを確認（Firebase再登録・再ログイン対策）
+    const existingByEmail = await this.userRepository.findByEmail(email);
+    if (existingByEmail) {
+      return existingByEmail;
+    }
 
-    // Userドメイン作成（3引数）
+    // ③ 新規作成
     const user = new User(0, uid, name, email);
-
-    // DB保存
-    const newUser = await this.userRepository.create(user, hashedPassword);
+    const newUser = await this.userRepository.create(user);
 
     return newUser;
   }
