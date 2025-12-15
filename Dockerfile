@@ -1,26 +1,41 @@
 FROM node:18-slim
 
+# ===============================
+# 作業ディレクトリ
+# ===============================
 WORKDIR /app
 
-# Prisma が必要とする OpenSSL をインストール
-RUN apt-get update -y && apt-get install -y openssl
+# ===============================
+# Prisma / Node が必要な依存
+# ===============================
+RUN apt-get update -y \
+  && apt-get install -y openssl \
+  && rm -rf /var/lib/apt/lists/*
 
-# 依存関係（lock file 前提）
+# ===============================
+# 依存関係インストール
+# ===============================
 COPY package*.json ./
+COPY prisma ./prisma
 RUN npm ci
 
-# ソースコードをコピー
+# ===============================
+# アプリケーションコード
+# ===============================
 COPY . .
 
-# Prisma Client を Linux 用に生成
-RUN npx prisma generate
-
-# TypeScript をビルド（dist/ を生成）
+# ===============================
+# TypeScript build
+# ===============================
 RUN npm run build
 
-# Cloud Run が自動で注入する PORT を利用
+# ===============================
+# Cloud Run 設定
+# ===============================
 ENV PORT=8080
 EXPOSE 8080
 
-# dist/server.js を直接起動
+# ===============================
+# 起動コマンド
+# ===============================
 CMD ["node", "dist/server.js"]

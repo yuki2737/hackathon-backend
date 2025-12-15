@@ -8,19 +8,30 @@ export class ProductController {
   async list(req: Request, res: Response) {
     try {
       const useCase = new ListProductsUseCase(new ProductRepository());
-      const { uid, keyword } = req.query;
+      const { uid, keyword, category, subCategory, minPrice, maxPrice } =
+        req.query;
 
       const uidParam = typeof uid === "string" ? uid : undefined;
       const keywordParam = typeof keyword === "string" ? keyword : undefined;
+      const categoryParam = typeof category === "string" ? category : undefined;
+      const subCategoryParam = Array.isArray(subCategory)
+        ? subCategory.filter((v): v is string => typeof v === "string")
+        : typeof subCategory === "string"
+        ? [subCategory]
+        : undefined;
+      const minPriceParam =
+        typeof minPrice === "string" ? Number(minPrice) : undefined;
+      const maxPriceParam =
+        typeof maxPrice === "string" ? Number(maxPrice) : undefined;
 
-      // 検索モード：keyword がある場合 → uid は無視
-      let products;
-      if (keywordParam) {
-        products = await useCase.execute(keywordParam, undefined);
-      } else {
-        // 出品一覧モード：uid がある場合のみフィルタ
-        products = await useCase.execute(undefined, uidParam);
-      }
+      const products = await useCase.execute({
+        uid: uidParam,
+        keyword: keywordParam,
+        category: categoryParam,
+        subCategory: subCategoryParam,
+        minPrice: minPriceParam,
+        maxPrice: maxPriceParam,
+      });
 
       return res.json({ message: "Products fetched successfully", products });
     } catch (error: any) {
@@ -48,8 +59,16 @@ export class ProductController {
 
   async create(req: Request, res: Response) {
     try {
-      const { uid, category, title, description, price, imageUrl, status } =
-        req.body;
+      const {
+        uid,
+        category,
+        subCategory,
+        title,
+        description,
+        price,
+        imageUrl,
+        status,
+      } = req.body;
 
       if (!uid) {
         return res.status(400).json({ error: "uid is required" });
@@ -59,6 +78,7 @@ export class ProductController {
       const product = await useCase.execute({
         uid,
         category,
+        subCategory,
         title,
         description,
         price,
@@ -77,13 +97,21 @@ export class ProductController {
   async update(req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
-      const { category, title, description, price, imageUrl, status } =
-        req.body;
+      const {
+        category,
+        subCategory,
+        title,
+        description,
+        price,
+        imageUrl,
+        status,
+      } = req.body;
 
       const repository = new ProductRepository();
       const product = await repository.update({
         id,
         category,
+        subCategory,
         title,
         description,
         price,

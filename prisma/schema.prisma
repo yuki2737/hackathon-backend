@@ -9,29 +9,45 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  uid       String    @unique
-  name      String
-  email     String    @unique
-  products  Product[]
-  orders    Order[]   @relation("UserOrders")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  uid           String    @unique
+  name          String
+  email         String    @unique
+  products      Product[]
+  orders        Order[]   @relation("UserOrders")
+  buyerThreads  Thread[]  @relation("BuyerThreads")
+  sellerThreads Thread[]  @relation("SellerThreads")
+  messages      Message[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  category    Category
-  title       String
-  description String?
-  price       Int
-  imageUrl    String
-  status      Status   @default(selling)
-  orders      Order[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                     Int                     @id @default(autoincrement())
+  userId                 Int
+  user                   User                    @relation(fields: [userId], references: [id])
+  category               Category
+  fashionSubCategory     FashionSubCategory?
+  electronicsSubCategory ElectronicsSubCategory?
+  bookSubCategory        BookSubCategory?
+  hobbySubCategory       HobbySubCategory?
+  sportsSubCategory      SportsSubCategory?
+  beautySubCategory      BeautySubCategory?
+  lifestyleSubCategory   LifestyleSubCategory?
+  handmadeSubCategory    HandmadeSubCategory?
+  kidsSubCategory        KidsSubCategory?
+  petSubCategory         PetSubCategory?
+  foodSubCategory        FoodSubCategory?
+  otherSubCategory       OtherSubCategory?
+  title                  String
+  description            String?                 @db.Text
+  price                  Int
+  imageUrl               String?
+  status                 Status                  @default(selling)
+  orders                 Order[]
+  threads                Thread[]
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 }
 
 model Order {
@@ -41,6 +57,32 @@ model Order {
   buyerId     Int
   buyer       User     @relation("UserOrders", fields: [buyerId], references: [id])
   purchasedAt DateTime @default(now())
+}
+
+model Thread {
+  id        Int        @id @default(autoincrement())
+  productId Int
+  product   Product    @relation(fields: [productId], references: [id])
+  buyerId   Int
+  buyer     User       @relation("BuyerThreads", fields: [buyerId], references: [id])
+  sellerId  Int
+  seller    User       @relation("SellerThreads", fields: [sellerId], references: [id])
+  type      ThreadType
+  messages  Message[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([productId, buyerId, type])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  threadId  Int
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  senderId  Int
+  sender    User     @relation(fields: [senderId], references: [id])
+  content   String   @db.Text
+  createdAt DateTime @default(now())
 }
 
 enum Category {
@@ -58,7 +100,93 @@ enum Category {
   other
 }
 
+enum FashionSubCategory {
+  tops
+  bottoms
+  shoes
+  fashion_other
+}
+
+enum ElectronicsSubCategory {
+  smartphone
+  computer
+  audio
+  electronics_other
+}
+
+enum BookSubCategory {
+  novel
+  comic
+  magazine
+  book_other
+}
+
+enum HobbySubCategory {
+  toy
+  model
+  collectible
+  hobby_other
+}
+
+enum SportsSubCategory {
+  equipment
+  clothing
+  accessory
+  sports_other
+}
+
+enum BeautySubCategory {
+  skincare
+  makeup
+  fragrance
+  beauty_other
+}
+
+enum LifestyleSubCategory {
+  kitchen
+  furniture
+  decor
+  lifestyle_other
+}
+
+enum HandmadeSubCategory {
+  jewelry
+  clothing
+  craft
+  handmade_other
+}
+
+enum KidsSubCategory {
+  clothing
+  toy
+  baby_goods
+  kids_other
+}
+
+enum PetSubCategory {
+  food
+  accessory
+  toys
+  pet_other
+}
+
+enum FoodSubCategory {
+  snack
+  beverage
+  ingredient
+  food_other
+}
+
+enum OtherSubCategory {
+  misc
+}
+
 enum Status {
   selling
   sold_out
+}
+
+enum ThreadType {
+  inquiry
+  order
 }

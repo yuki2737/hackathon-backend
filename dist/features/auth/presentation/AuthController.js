@@ -20,7 +20,9 @@ class AuthController {
             });
         }
         catch (error) {
-            return res.status(400).json({ error: error.message });
+            return res.status(200).json({
+                message: "User already exists or registration skipped",
+            });
         }
     }
     async getUser(req, res) {
@@ -30,11 +32,17 @@ class AuthController {
                 return res.status(400).json({ error: "uid is required" });
             }
             const repo = new UserRepository_1.UserRepository();
-            const user = await repo.findByUid(String(uid));
+            let user = await repo.findByUid(String(uid));
+            // 未登録の場合：自動登録（name / email があれば）
             if (!user) {
-                return res.status(404).json({ error: "User not found" });
+                const { name, email } = req.query;
+                if (!name || !email) {
+                    return res.status(200).json({ user: null });
+                }
+                const useCase = new RegisterUseCase_1.RegisterUseCase(repo);
+                user = await useCase.execute(String(uid), String(name), String(email));
             }
-            return res.json({
+            return res.status(200).json({
                 id: user.id,
                 uid: user.uid,
                 name: user.name,

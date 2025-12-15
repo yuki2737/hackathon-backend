@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client"; // ← Statusはimportしない
 export interface CreateProductDTO {
   uid: string;
   category: string;
+  subCategory: string;
   title: string;
   description: string;
   price: number;
@@ -22,10 +23,15 @@ export class CreateProductUseCase {
       throw new Error("User not found");
     }
 
+    if (!data.subCategory) {
+      throw new Error("subCategory is required");
+    }
+
     const product = new Product(
       0,
       user.id, // uid → userId に変換
       data.category,
+      data.subCategory,
       data.title,
       data.description,
       data.price,

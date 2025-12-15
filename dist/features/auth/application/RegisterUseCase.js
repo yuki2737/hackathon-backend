@@ -7,14 +7,18 @@ class RegisterUseCase {
         this.userRepository = userRepository;
     }
     async execute(uid, name, email) {
-        // 既存メールがあるか確認
-        const existingUser = await this.userRepository.findByEmail(email);
-        if (existingUser) {
-            throw new Error("Email already exists");
+        // ① uid で既存ユーザーを確認（最優先）
+        const existingByUid = await this.userRepository.findByUid(uid);
+        if (existingByUid) {
+            return existingByUid;
         }
-        // Userドメイン作成（3引数）
+        // ② email で既存ユーザーを確認（Firebase再登録・再ログイン対策）
+        const existingByEmail = await this.userRepository.findByEmail(email);
+        if (existingByEmail) {
+            return existingByEmail;
+        }
+        // ③ 新規作成
         const user = new User_1.User(0, uid, name, email);
-        // DB保存
         const newUser = await this.userRepository.create(user);
         return newUser;
     }

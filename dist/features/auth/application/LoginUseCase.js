@@ -15,9 +15,6 @@ class LoginUseCase {
      */
     async execute(uid) {
         const user = await this.userRepository.findByUid(uid);
-        if (!user) {
-            throw new Error("User not found");
-        }
         return user;
     }
 }

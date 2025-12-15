@@ -3,6 +3,9 @@ import cors from "cors";
 import AuthRoutes from "./features/auth/presentation/AuthRoutes";
 import ProductRoutes from "./features/products/presentation/ProductRoutes";
 import OrderRoutes from "./features/orders/presentation/OrderRoutes";
+import AiRoutes from "./features/ai/presentation/AiRoutes";
+import ImageRoutes from "./features/images/presentation/ImageRoutes";
+import threadRoutes from "./features/threads/presentation/ThreadRoutes";
 
 const app = express();
 
@@ -13,14 +16,23 @@ const allowedOrigins = process.env.CORS_ORIGIN
 app.use(
   cors({
     origin: (origin, callback) => {
-      // preflight / curl / server-to-server は必ず許可
-      if (!origin) return callback(null, true);
+      /**
+       * Cloud Run / curl / server-to-server / preflight では
+       * origin が undefined になるため常に許可する
+       */
+      if (!origin) {
+        return callback(null, true);
+      }
 
+      /**
+       * 明示的に許可した origin のみチェック
+       * ※ 現状は「拒否しない」設計（将来 tighten 可能）
+       */
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // ❌ false ではなく、明示的にエラーを返さない（preflight 500 防止）
+      // 現段階では CORS で弾かず通す（フロント増加に耐える）
       return callback(null, true);
     },
     credentials: true,
@@ -29,10 +41,19 @@ app.use(
   })
 );
 
-// preflight を必ず通す
+// preflight を必ず通す（Cloud Run + ブラウザ安定化）
 app.options("*", cors());
 
+// JSON body をパース
 app.use(express.json());
+
+// リクエストログ（本番では最小限）
+app.use((req, _res, next) => {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[REQUEST] ${req.method} ${req.path}`);
+  }
+  next();
+});
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
@@ -41,5 +62,8 @@ app.get("/health", (_req, res) => {
 app.use("/auth", AuthRoutes);
 app.use("/products", ProductRoutes);
 app.use("/orders", OrderRoutes);
+app.use("/ai", AiRoutes);
+app.use("/images", ImageRoutes);
+app.use("/threads", threadRoutes);
 
 export default app;

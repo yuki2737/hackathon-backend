@@ -2,7 +2,14 @@
 import { Product } from "./Product";
 
 export interface IProductRepository {
-  findAll(keyword?: string, uid?: string): Promise<Product[]>;
+  findAll(params: {
+    uid?: string;
+    keyword?: string;
+    category?: string;
+    subCategory?: string[]; // ← 複数選択対応
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<Product[]>;
   findById(id: number): Promise<Product | null>;
   create(product: Product): Promise<Product>; // ← 追加
   update(data: {
@@ -13,6 +20,7 @@ export interface IProductRepository {
     imageUrl?: string;
     status?: string;
     category?: string;
+    subCategory?: string;
   }): Promise<Product>;
   delete(id: number): Promise<void>;
   findUserByUid(uid: string): Promise<any>;

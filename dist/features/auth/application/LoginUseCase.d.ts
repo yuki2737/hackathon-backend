@@ -11,6 +11,6 @@ export declare class LoginUseCase {
     /**
      * @param uid Firebase Auth の UID
      */
-    execute(uid: string): Promise<User>;
+    execute(uid: string): Promise<User | null>;
 }
 //# sourceMappingURL=LoginUseCase.d.ts.map

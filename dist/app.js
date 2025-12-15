@@ -8,6 +8,7 @@ const cors_1 = __importDefault(require("cors"));
 const AuthRoutes_1 = __importDefault(require("./features/auth/presentation/AuthRoutes"));
 const ProductRoutes_1 = __importDefault(require("./features/products/presentation/ProductRoutes"));
 const OrderRoutes_1 = __importDefault(require("./features/orders/presentation/OrderRoutes"));
+const AiRoutes_1 = __importDefault(require("./features/ai/presentation/AiRoutes"));
 const app = (0, express_1.default)();
 const allowedOrigins = process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
@@ -20,7 +21,7 @@ app.use((0, cors_1.default)({
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
-        // ❌ false ではなく、明示的にエラーを返さない（preflight 500 防止）
+        // 明示的に拒否せず通す（Cloud Run + preflight 安定化）
         return callback(null, true);
     },
     credentials: true,
@@ -30,11 +31,17 @@ app.use((0, cors_1.default)({
 // preflight を必ず通す
 app.options("*", (0, cors_1.default)());
 app.use(express_1.default.json());
+// リクエストログ（Cloud Run デバッグ用）
+app.use((req, _res, next) => {
+    console.log(`[REQUEST] ${req.method} ${req.path}`);
+    next();
+});
 app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
 });
 app.use("/auth", AuthRoutes_1.default);
 app.use("/products", ProductRoutes_1.default);
 app.use("/orders", OrderRoutes_1.default);
+app.use("/ai", AiRoutes_1.default);
 exports.default = app;
 //# sourceMappingURL=app.js.map
