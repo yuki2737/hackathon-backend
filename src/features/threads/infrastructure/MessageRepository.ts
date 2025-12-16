@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { IMessageRepository } from "../domain/IMessageRepository";
 import { Message } from "../domain/Message";
 
@@ -15,7 +15,16 @@ export class MessageRepository implements IMessageRepository {
     return new Message(m.id, m.threadId, m.senderId, m.content, m.createdAt);
   }
 
-  async findByThread(threadId: number): Promise<any[]> {
+  async findByThread(threadId: number): Promise<
+    {
+      id: number;
+      threadId: number;
+      senderId: number;
+      senderUid: string;
+      content: string;
+      createdAt: Date;
+    }[]
+  > {
     if (!threadId || Number.isNaN(threadId)) {
       throw new Error("Invalid threadId");
     }
@@ -32,13 +41,24 @@ export class MessageRepository implements IMessageRepository {
       },
     });
 
-    return messages.map((m) => ({
-      id: m.id,
-      threadId: m.threadId,
-      senderId: m.senderId,
-      senderUid: m.sender.uid,
-      content: m.content,
-      createdAt: m.createdAt,
-    }));
+    return messages.map(
+      (m: {
+        id: number;
+        threadId: number;
+        senderId: number;
+        content: string;
+        createdAt: Date;
+        sender: {
+          uid: string;
+        };
+      }) => ({
+        id: m.id,
+        threadId: m.threadId,
+        senderId: m.senderId,
+        senderUid: m.sender.uid,
+        content: m.content,
+        createdAt: m.createdAt,
+      })
+    );
   }
 }

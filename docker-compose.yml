@@ -8,10 +8,10 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: hackathon
-      MYSQL_USER: hackathon
-      MYSQL_PASSWORD: password
+      MYSQL_USER: uttc
+      MYSQL_PASSWORD: Uttc@hackathon2025!
     volumes:
       - mysql_data:/var/lib/mysql
 

@@ -72,7 +72,16 @@ export class ThreadRepository implements IThreadRepository {
     });
 
     return threads.map(
-      (t) =>
+      (t: {
+        id: number;
+        productId: number;
+        buyerId: number;
+        sellerId: number;
+        type: string;
+        createdAt: Date;
+        updatedAt: Date;
+        messages: { content: string }[];
+      }) =>
         new Thread(
           t.id,
           t.productId,
