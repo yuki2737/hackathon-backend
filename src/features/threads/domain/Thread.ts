@@ -7,6 +7,10 @@ export class Thread {
     public readonly type: "inquiry" | "order",
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
-    public readonly lastMessage: string | null
+    public readonly lastMessage: string | null,
+    public readonly product: {
+      title: string | null;
+      imageUrl: string | null;
+    } | null = null
   ) {}
 }

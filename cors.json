@@ -2,7 +2,7 @@
   {
     "origin": [
       "http://localhost:3000",
-      "https://hackathon-frontend-jloxzy8rx-yukis-projects-a600261d.vercel.app"
+      "https://hackathon-frontend-eight-theta.vercel.app"
     ],
     "method": ["GET", "PUT", "POST", "HEAD"],
     "responseHeader": ["Content-Type"],

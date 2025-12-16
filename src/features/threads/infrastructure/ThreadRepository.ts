@@ -72,16 +72,7 @@ export class ThreadRepository implements IThreadRepository {
     });
 
     return threads.map(
-      (t: {
-        id: number;
-        productId: number;
-        buyerId: number;
-        sellerId: number;
-        type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        messages: { content: string }[];
-      }) =>
+      (t: any) =>
         new Thread(
           t.id,
           t.productId,
@@ -90,7 +81,11 @@ export class ThreadRepository implements IThreadRepository {
           t.type as "inquiry" | "order",
           t.createdAt,
           t.updatedAt,
-          t.messages?.[0]?.content ?? null
+          t.messages?.[0]?.content ?? null,
+          {
+            title: t.product?.title ?? null,
+            imageUrl: t.product?.imageUrl ?? null,
+          }
         )
     );
   }
@@ -116,7 +111,11 @@ export class ThreadRepository implements IThreadRepository {
       t.type,
       t.createdAt,
       t.updatedAt,
-      t.messages?.[0]?.content ?? null
+      t.messages?.[0]?.content ?? null,
+      {
+        title: t.product?.title ?? null,
+        imageUrl: t.product?.imageUrl ?? null,
+      }
     );
   }
 }
