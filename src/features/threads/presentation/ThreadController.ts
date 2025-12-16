@@ -83,8 +83,27 @@ export class ThreadController {
 
     const product = await prisma.product.findUnique({
       where: { id: thread.productId },
+      include: {
+        user: {
+          select: {
+            uid: true,
+          },
+        },
+      },
     });
 
-    res.json({ thread: { ...thread, product } });
+    res.json({
+      thread: {
+        id: thread.id,
+        productId: thread.productId,
+        buyerId: thread.buyerId,
+        sellerId: thread.sellerId,
+        type: thread.type,
+        createdAt: thread.createdAt,
+        updatedAt: thread.updatedAt,
+        lastMessage: thread.lastMessage,
+        product,
+      },
+    });
   }
 }

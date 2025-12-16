@@ -6,6 +6,10 @@ import OrderRoutes from "./features/orders/presentation/OrderRoutes";
 import AiRoutes from "./features/ai/presentation/AiRoutes";
 import ImageRoutes from "./features/images/presentation/ImageRoutes";
 import threadRoutes from "./features/threads/presentation/ThreadRoutes";
+import listingEvaluationRoutes from "./features/listingEvaluation/presentation/ListingEvaluationRoutes";
+import { purchaseDecisionSupportRouter } from "./features/purchase-decision-support/presentation/PurchaseDecisionSupportRouter";
+import { dmQuestionSuggestionRouter } from "./features/dm-question-suggestions/presentation/DmQuestionSuggestionRouter";
+import { dmAnswerSuggestionRouter } from "./features/dm-answer-suggestions/presentation/DmAnswerSuggestionRouter";
 
 const app = express();
 
@@ -65,5 +69,9 @@ app.use("/orders", OrderRoutes);
 app.use("/ai", AiRoutes);
 app.use("/images", ImageRoutes);
 app.use("/threads", threadRoutes);
+app.use(listingEvaluationRoutes);
+app.use(purchaseDecisionSupportRouter());
+app.use(dmQuestionSuggestionRouter());
+app.use(dmAnswerSuggestionRouter());
 
 export default app;

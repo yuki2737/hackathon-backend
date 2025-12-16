@@ -1,4 +1,5 @@
 export class Thread {
+  meta: any;
   constructor(
     public readonly id: number,
     public readonly productId: number,
@@ -11,6 +12,7 @@ export class Thread {
     public readonly product: {
       title: string | null;
       imageUrl: string | null;
+      sellerFirebaseUid: string | null;
     } | null = null
   ) {}
 }

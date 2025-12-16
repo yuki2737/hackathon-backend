@@ -62,7 +62,15 @@ export class ThreadRepository implements IThreadRepository {
         OR: [{ buyerId: userId }, { sellerId: userId }],
       },
       include: {
-        product: true,
+        product: {
+          include: {
+            user: {
+              select: {
+                uid: true,
+              },
+            },
+          },
+        },
         messages: {
           orderBy: { createdAt: "desc" },
           take: 1,
@@ -85,6 +93,7 @@ export class ThreadRepository implements IThreadRepository {
           {
             title: t.product?.title ?? null,
             imageUrl: t.product?.imageUrl ?? null,
+            sellerFirebaseUid: t.product?.user?.uid ?? null,
           }
         )
     );
@@ -94,7 +103,15 @@ export class ThreadRepository implements IThreadRepository {
     const t = await prisma.thread.findUnique({
       where: { id },
       include: {
-        product: true,
+        product: {
+          include: {
+            user: {
+              select: {
+                uid: true,
+              },
+            },
+          },
+        },
         messages: {
           orderBy: { createdAt: "desc" },
           take: 1,
@@ -115,6 +132,7 @@ export class ThreadRepository implements IThreadRepository {
       {
         title: t.product?.title ?? null,
         imageUrl: t.product?.imageUrl ?? null,
+        sellerFirebaseUid: t.product?.user?.uid ?? null,
       }
     );
   }
