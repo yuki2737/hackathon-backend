@@ -1,8 +1,0 @@
-import { User } from "../domain/User";
-import { IAuthRepository } from "../domain/IAuthRepository";
-export declare class UserRepository implements IAuthRepository {
-    findByEmail(email: string): Promise<User | null>;
-    create(user: User): Promise<User>;
-    findByUid(uid: string): Promise<User | null>;
-}
-//# sourceMappingURL=UserRepository.d.ts.map
