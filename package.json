@@ -40,6 +40,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.10.1",
+    "@types/node-fetch": "^2.6.13",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

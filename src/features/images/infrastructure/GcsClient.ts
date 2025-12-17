@@ -1,12 +1,15 @@
 import { Storage } from "@google-cloud/storage";
 
-const BUCKET_NAME = "hackathon-product-images-385248507107";
+const BUCKET_NAME = process.env.GCS_BUCKET_NAME;
 
 export class GcsClient {
   private storage: Storage;
   private bucket;
 
   constructor() {
+    if (!BUCKET_NAME) {
+      throw new Error("GCS_BUCKET_NAME is not set");
+    }
     // Use Application Default Credentials (ADC)
     // Local: gcloud auth application-default login
     // Cloud Run: attached service account
