@@ -36,3 +36,8 @@ Thumbs.db
 # ===== Misc =====
 *.swp
 .vercel
+
+
+.venv/
+__pycache__/
+*.pyc
