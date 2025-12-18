@@ -1,5 +1,3 @@
-# src/features/ai/image_text_consistency/schema.py
-
 from typing import List, TypedDict
 
 
@@ -9,10 +7,9 @@ class ImageFinding(TypedDict):
 
 
 class GapFinding(TypedDict):
-    issue: str
-    message: str
+    similarity: float
 
 
 class AnalysisResult(TypedDict):
     image_findings: List[ImageFinding]
-    description_gaps: List[GapFinding]
+    description_gap: GapFinding

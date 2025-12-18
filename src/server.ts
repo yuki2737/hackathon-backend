@@ -14,6 +14,6 @@ import app from "./app";
 // Cloud Run は PORT=8080 を要求する
 const port = Number(process.env.PORT) || 8080;
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });

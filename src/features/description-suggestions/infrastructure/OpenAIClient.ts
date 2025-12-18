@@ -1,16 +1,20 @@
 import OpenAI from "openai";
 
 export class OpenAIClient {
-  private client: OpenAI;
+  private client: OpenAI | null = null;
 
-  constructor() {
+  private getClient(): OpenAI {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not set");
     }
 
-    this.client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    if (!this.client) {
+      this.client = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    }
+
+    return this.client;
   }
 
   async generateDescription(title: string, prompt?: string): Promise<string> {
@@ -19,7 +23,7 @@ export class OpenAIClient {
 
     const userPrompt = `商品名: ${title}\n要望: ${prompt || "特になし"}`;
 
-    const response = await this.client.responses.create({
+    const response = await this.getClient().responses.create({
       model: "gpt-4.1-mini",
       input: [
         {

@@ -10,6 +10,7 @@ import listingEvaluationRoutes from "./features/listingEvaluation/presentation/L
 import { purchaseDecisionSupportRouter } from "./features/purchase-decision-support/presentation/PurchaseDecisionSupportRouter";
 import { dmQuestionSuggestionRouter } from "./features/dm-question-suggestions/presentation/DmQuestionSuggestionRouter";
 import { dmAnswerSuggestionRouter } from "./features/dm-answer-suggestions/presentation/DmAnswerSuggestionRouter";
+
 import imageTextConsistencyRouter from "./features/ai/imageTextConsistency/imageTextConsistency.router";
 
 const app = express();
@@ -74,6 +75,5 @@ app.use(listingEvaluationRoutes);
 app.use(purchaseDecisionSupportRouter());
 app.use(dmQuestionSuggestionRouter());
 app.use(dmAnswerSuggestionRouter());
-app.use("/ai/image-text-consistency", imageTextConsistencyRouter);
-
+app.use(imageTextConsistencyRouter);
 export default app;

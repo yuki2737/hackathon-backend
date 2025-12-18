@@ -1,6 +1,7 @@
-// imageTextConsistency.controller.ts
+// src/features/ai/imageTextConsistency/imageTextConsistency.controller.ts
+
 import { Request, Response } from "express";
-import { checkImageTextConsistency } from "./imageTextConsistency.service";
+import { analyzeImageTextConsistency } from "./imageTextConsistency.service";
 
 export async function imageTextConsistencyController(
   req: Request,
@@ -13,12 +14,16 @@ export async function imageTextConsistencyController(
     if (!file) {
       return res.status(400).json({ message: "image is required" });
     }
+    if (!description) {
+      return res.status(400).json({ message: "description is required" });
+    }
 
-    const result = await checkImageTextConsistency(
-      file.buffer,
-      file.originalname,
-      description
-    );
+    const result = await analyzeImageTextConsistency({
+      buffer: file.buffer,
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      description,
+    });
 
     res.json(result);
   } catch (err) {
