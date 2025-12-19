@@ -1,6 +1,8 @@
 import { IProductRepository } from "../domain/IProductRepository";
 import { Product } from "../domain/Product";
 
+type ProductSort = "price_asc" | "price_desc";
+
 export class ListProductsUseCase {
   constructor(private readonly productRepository: IProductRepository) {}
 
@@ -13,9 +15,10 @@ export class ListProductsUseCase {
     uid?: string;
     keyword?: string;
     category?: string;
-    subCategory?: string[]; // ← 配列に変更
+    subCategory?: string[];
     minPrice?: number;
     maxPrice?: number;
+    sort?: ProductSort;
   }): Promise<Product[]> {
     return await this.productRepository.findAll(params);
   }
