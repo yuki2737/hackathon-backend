@@ -1,7 +1,7 @@
 import { IProductRepository } from "../domain/IProductRepository";
 import { Product } from "../domain/Product";
 
-type ProductSort = "price_asc" | "price_desc";
+export type ProductSort = "price_asc" | "price_desc";
 
 export class ListProductsUseCase {
   constructor(private readonly productRepository: IProductRepository) {}

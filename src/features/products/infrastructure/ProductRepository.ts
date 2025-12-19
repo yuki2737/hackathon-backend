@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { IProductRepository } from "../domain/IProductRepository";
 import { Product } from "../domain/Product";
 
@@ -94,13 +94,13 @@ export class ProductRepository implements IProductRepository {
       where.AND = andConditions;
     }
 
-    let orderBy: any;
+    let orderBy: Prisma.ProductOrderByWithRelationInput;
     if (params.sort === "price_asc") {
-      orderBy = { price: "asc" };
+      orderBy = { price: Prisma.SortOrder.asc };
     } else if (params.sort === "price_desc") {
-      orderBy = { price: "desc" };
+      orderBy = { price: Prisma.SortOrder.desc };
     } else {
-      orderBy = { createdAt: "desc" };
+      orderBy = { createdAt: Prisma.SortOrder.desc };
     }
 
     const products = await prisma.product.findMany({

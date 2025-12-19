@@ -24,7 +24,7 @@ export class ProductController {
       const maxPriceParam =
         typeof maxPrice === "string" ? Number(maxPrice) : undefined;
 
-      const sortParam =
+      const sortParam: "price_asc" | "price_desc" | undefined =
         sort === "price_asc" || sort === "price_desc" ? sort : undefined;
 
       const products = await useCase.execute({
