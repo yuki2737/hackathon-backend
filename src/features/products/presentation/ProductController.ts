@@ -8,7 +8,7 @@ export class ProductController {
   async list(req: Request, res: Response) {
     try {
       const useCase = new ListProductsUseCase(new ProductRepository());
-      const { uid, keyword, category, subCategory, minPrice, maxPrice } =
+      const { uid, keyword, category, subCategory, minPrice, maxPrice, sort } =
         req.query;
 
       const uidParam = typeof uid === "string" ? uid : undefined;
@@ -24,6 +24,9 @@ export class ProductController {
       const maxPriceParam =
         typeof maxPrice === "string" ? Number(maxPrice) : undefined;
 
+      const sortParam =
+        sort === "price_asc" || sort === "price_desc" ? sort : undefined;
+
       const products = await useCase.execute({
         uid: uidParam,
         keyword: keywordParam,
@@ -31,6 +34,7 @@ export class ProductController {
         subCategory: subCategoryParam,
         minPrice: minPriceParam,
         maxPrice: maxPriceParam,
+        sort: sortParam,
       });
 
       return res.json({ message: "Products fetched successfully", products });

@@ -12,6 +12,7 @@ export class ProductRepository implements IProductRepository {
     subCategory?: string[]; // ← 配列に変更
     minPrice?: number;
     maxPrice?: number;
+    sort?: "price_asc" | "price_desc";
   }): Promise<Product[]> {
     const where: any = {};
     const andConditions: any[] = [];
@@ -93,10 +94,19 @@ export class ProductRepository implements IProductRepository {
       where.AND = andConditions;
     }
 
+    let orderBy: any;
+    if (params.sort === "price_asc") {
+      orderBy = { price: "asc" };
+    } else if (params.sort === "price_desc") {
+      orderBy = { price: "desc" };
+    } else {
+      orderBy = { createdAt: "desc" };
+    }
+
     const products = await prisma.product.findMany({
       where,
       include: { user: true },
-      orderBy: { createdAt: "desc" },
+      orderBy,
     });
 
     return products.map((p: any) => {
