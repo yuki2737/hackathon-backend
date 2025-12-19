@@ -1,4 +1,4 @@
-import { OpenAIClient } from "../infrastructure/OpenAIClient";
+import { OpenAIClient } from "../infrastructure/GeminiClient";
 
 export class GenerateDescriptionUseCase {
   private openAIClient: OpenAIClient;
